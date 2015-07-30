@@ -1,0 +1,58 @@
+import UIKit
+
+func isDict(dict: AnyObject) -> Bool {
+  return dict.dynamicType.description() == NSDictionary().dynamicType.description() || dict.dynamicType.description() == "__NSCFDictionary"
+}
+
+func isArr(arr: AnyObject) -> Bool {
+  arr.dynamicType.description()
+  return arr.dynamicType.description() == NSArray().dynamicType.description() || arr.dynamicType.description() == "__NSCFArray"
+}
+
+
+class JSONParser {
+  static func jsonFromData(data: NSData) -> ([AnyObject],Dictionary<String, AnyObject>) {
+    var dict = Dictionary<String, AnyObject>()
+    var arr = [AnyObject]()
+    var nsObj: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableLeaves, error: nil)
+    if isDict(nsObj!) {
+      dict = JSONParser.parseDict(nsObj as! NSDictionary)
+    } else if isArr(nsObj!) {
+      arr = JSONParser.parseArray(nsObj as! NSArray)
+    }
+
+    return (arr,dict)
+  }
+  
+  
+  static func parseArray(nsArr: NSArray) -> Array<AnyObject> {
+    var arr = [AnyObject]()
+    for obj in nsArr {
+      if isDict(obj) {
+        arr.append(JSONParser.parseDict(obj as! NSDictionary))
+      } else if isArr(obj) {
+        arr.append(JSONParser.parseArray(obj as! NSArray))
+      } else {
+        arr.append(obj)
+      }
+    }
+    
+    return arr
+  }
+  
+  static func parseDict(nsDict: NSDictionary) -> Dictionary<String,AnyObject>{
+    var dict = Dictionary<String, AnyObject>()
+    for (key,value) in nsDict {
+      if isDict(value) {
+        dict[key as! String] = parseDict(value as! NSDictionary)
+      } else if isArr(value) {
+        dict[key as! String] = parseArray(value as! NSArray)
+      } else {
+        dict[key as! String] = value
+      }
+    }
+    return dict
+  }
+  
+  
+}
