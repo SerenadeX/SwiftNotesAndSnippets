@@ -1,4 +1,15 @@
+
 import UIKit
+
+func isDict(dict: AnyObject) -> Bool {
+    return dict.dynamicType.description() == NSDictionary().dynamicType.description() || dict.dynamicType.description() == "__NSCFDictionary"
+}
+
+func isArr(arr: AnyObject) -> Bool {
+    arr.dynamicType.description()
+    return arr.dynamicType.description() == NSArray().dynamicType.description() || arr.dynamicType.description() == "__NSCFArray"
+}
+
 
 class JSONParser {
     static func jsonFromData(data: NSData) throws -> ([AnyObject],Dictionary<String, AnyObject>) {
